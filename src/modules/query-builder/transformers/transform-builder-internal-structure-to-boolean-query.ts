@@ -1,7 +1,7 @@
 import type { BuilderInternalStructure } from "~/modules/query-builder/schemas/builder-internal-structure";
 
-import { booleanQuerySchema } from "~/modules/query-builder/schemas/boolean-query";
-import { queryRuleSchema } from "~/modules/query-builder/schemas/query-rule";
+import { type BooleanQuery, booleanQuerySchema } from "~/modules/query-builder/schemas/boolean-query";
+import { type QueryRule, queryRuleSchema } from "~/modules/query-builder/schemas/query-rule";
 import { extractHashId, isGroupPath, isRulePath } from "~/modules/query-builder/utils/extract-hash-id";
 
 export function transformBuilderInternalStructureToBooleanQuery(transformed: BuilderInternalStructure): any {
@@ -12,9 +12,9 @@ export function transformBuilderInternalStructureToBooleanQuery(transformed: Bui
         return queryRuleSchema.parse(rule);
     };
 
-    const resolveGroup = (hash: string) => {
+    const resolveGroup = (hash: string): BooleanQuery => {
         const group = groups[isGroupPath(hash) ? extractHashId(hash) : hash];
-        const rule = resolveRule(group.rule);
+        const rule: QueryRule | BooleanQuery = isRulePath(group.join) ? resolveRule(group.join) : resolveGroup(group.join);
 
         const operands: any = group.opd.map((opd) => {
             if (isRulePath(opd)) {

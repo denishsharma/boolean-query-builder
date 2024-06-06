@@ -18,6 +18,6 @@ const textRuleSchema = z.object({
 export const queryRuleSchema = z.union([dropdownRuleScehma, textRuleSchema]);
 export type QueryRule = z.infer<typeof queryRuleSchema>;
 
-export const internalQueryRuleSchema = z.union([dropdownRuleScehma.extend({ signature: z.string(), groupId: z.string(), primary: z.boolean().default(false) }), textRuleSchema.extend({ signature: z.string(), groupId: z.string(), primary: z.boolean().default(false) })]);
+export const internalQueryRuleSchema = z.union([dropdownRuleScehma.extend({ signature: z.string(), group: z.string(), primary: z.boolean().default(false) }), textRuleSchema.extend({ signature: z.string(), group: z.string(), primary: z.boolean().default(false) })]);
 export type InternalQueryRule = z.infer<typeof internalQueryRuleSchema>;
 export type InternalQueryRuleOf<T extends "dropdown" | "text"> = T extends "dropdown" ? z.infer<typeof dropdownRuleScehma> : z.infer<typeof textRuleSchema>;

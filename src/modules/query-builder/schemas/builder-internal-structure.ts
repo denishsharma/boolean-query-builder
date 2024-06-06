@@ -4,8 +4,9 @@ import { internalQueryRuleSchema } from "~/modules/query-builder/schemas/query-r
 
 const queryGroupSchema = z.object({
     id: z.string(),
-    rule: z.string(),
-    parentGroupId: z.string().nullable(),
+    join: z.string(),
+    parent: z.string().nullable(),
+    primary: z.boolean().default(false),
     op: z.enum(["and", "or"]),
     opd: z.array(z.string().regex(/^(rule|group)::(.*$)/)),
 });

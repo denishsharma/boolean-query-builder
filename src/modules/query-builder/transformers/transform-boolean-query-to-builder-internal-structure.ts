@@ -4,6 +4,7 @@ import type { BooleanQuery } from "~/modules/query-builder/schemas/boolean-query
 import type { QueryRule } from "~/modules/query-builder/schemas/query-rule";
 
 import { type BuilderInternalStructure, builderInternalStructureSchema } from "~/modules/query-builder/schemas/builder-internal-structure";
+import { getGroupPath, getRulePath } from "~/modules/query-builder/utils/extract-hash-id";
 import { isQueryStructure } from "~/modules/query-builder/utils/is-query-structure";
 
 export function transformBooleanQueryToBuilderInternalStructure(data: BooleanQuery): BuilderInternalStructure {
@@ -12,27 +13,28 @@ export function transformBooleanQueryToBuilderInternalStructure(data: BooleanQue
 
     const processRule = (rule: QueryRule, groupId: string, primary = false) => {
         const _ruleHash = nanoid();
-        const _rule = { ...rule, signature: _ruleHash, groupId, primary };
+        const _rule = { ...rule, signature: _ruleHash, group: groupId, primary };
         rules[_ruleHash] = _rule;
 
         return _ruleHash;
     };
 
-    const processGroup = (group: BooleanQuery, parentGroupId: string | null = null): string => {
+    const processGroup = (group: BooleanQuery, parentGroupId: string | null = null, primary = false): string => {
         const _groupHash = nanoid();
 
-        const _ruleHash = processRule(group.rule, _groupHash, true);
+        const _joinHash = isQueryStructure(group.rule) ? getGroupPath(processGroup(group.rule, _groupHash, true)) : getRulePath(processRule(group.rule, _groupHash, true));
 
         groups[_groupHash] = {
-            parentGroupId,
+            parent: parentGroupId,
+            primary,
             id: _groupHash,
-            rule: _ruleHash,
+            join: _joinHash,
             op: group.operator,
             opd: group.operands.map((item) => {
                 if (isQueryStructure(item)) {
-                    return `group::${processGroup(item, _groupHash)}`;
+                    return getGroupPath(processGroup(item, _groupHash));
                 } else {
-                    return `rule::${processRule(item, _groupHash)}`;
+                    return getRulePath(processRule(item, _groupHash));
                 }
             }),
         };
@@ -42,5 +44,5 @@ export function transformBooleanQueryToBuilderInternalStructure(data: BooleanQue
 
     const query = processGroup(data);
 
-    return builderInternalStructureSchema.parse({ rules, groups, query: `group::${query}` });
+    return builderInternalStructureSchema.parse({ rules, groups, query: getGroupPath(query) });
 }

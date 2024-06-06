@@ -3,6 +3,7 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import type { ComponentPropsWithoutRef } from "react";
 
 import { RuleGroup } from "~/modules/query-builder/components/rule-group";
+import { useDebugQuery } from "~/modules/query-builder/hooks/use-debug-query";
 import { useExportQuery } from "~/modules/query-builder/hooks/use-export-query";
 import { useImportQuery } from "~/modules/query-builder/hooks/use-import-query";
 import { useInitialQueryBuilderState } from "~/modules/query-builder/hooks/use-initial-query-builder-state";
@@ -26,13 +27,15 @@ function QueryBuilderFragmentConsumer() {
 
     useInitialQueryBuilderState();
 
+    const { logInternalStructure } = useDebugQuery();
+
     const importQuery = useImportQuery();
     const exportQuery = useExportQuery();
 
     return (
         <div className="relative bg-dark-800 text-light-50 h-dvh">
             <OverlayScrollbarsComponent defer options={defaultOverlayScrollbarsOptions} className="h-dvh">
-                <div className="m-20 mx-a w-2xl overflow-clip border border-dark-300 rounded-xl bg-dark-600 shadow-lg divide-y divide-dark-300">
+                <div className="m-20 mx-a w-5xl overflow-clip border border-dark-300 rounded-xl bg-dark-600 shadow-lg divide-y divide-dark-300">
                     <div className="gapx-4 flex items-center justify-between bg-dark-400/50 p-3">
                         <div className="flex items-center">
                             <div className="size-8 flex select-none items-center justify-center rounded-lg bg-teal-800 text-sm text-light-50 font-bold leading-none">
@@ -54,7 +57,18 @@ function QueryBuilderFragmentConsumer() {
                             </div>
                         </div>
 
-                        <div className="flex gap-x-2">
+                        <div className="flex shrink-0 items-center gap-x-2">
+                            <button
+                                type="button"
+                                title="Console Log Internal Structure"
+                                onClick={logInternalStructure}
+                                className="size-8 flex cursor-pointer items-center justify-center gap-x-2 border border-transparent rounded-lg bg-transparent text-sm outline-none transition active:(border-dark-300 bg-dark-400) hover:(bg-dark-200) light:active:(border-gray-300 bg-light-50) light:hover:(bg-light-50)"
+                            >
+                                <span className="i-mynaui:terminal size-5 transition" />
+                            </button>
+
+                            <div className="h-4 w-px bg-dark-200" />
+
                             <button
                                 type="button"
                                 title="Import Query JSON"

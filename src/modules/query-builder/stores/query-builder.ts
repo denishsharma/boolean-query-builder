@@ -6,7 +6,7 @@ import type { BuilderInternalStructure } from "~/modules/query-builder/schemas/b
 
 import { createStoreContext } from "~/hooks/create-store-context";
 import { transformBooleanQueryToBuilderInternalStructure } from "~/modules/query-builder/transformers/transform-boolean-query-to-builder-internal-structure";
-import { extractHashId, isGroupPath, isRulePath } from "~/modules/query-builder/utils/extract-hash-id";
+import { extractHashId, getGroupPath, getRulePath, isGroupPath, isRulePath } from "~/modules/query-builder/utils/extract-hash-id";
 import { defineStoreInstance } from "~/utils/store";
 
 interface State {
@@ -64,7 +64,7 @@ const queryBuilderStoreInstance = defineStoreInstance<State, Actions>((init) => 
                     const _ruleHash = nanoid();
                     state.rules[_ruleHash] = {
                         signature: _ruleHash,
-                        groupId: _groupId,
+                        group: _groupId,
                         primary: false,
                         where: "dropdown",
                         data: {
@@ -73,7 +73,7 @@ const queryBuilderStoreInstance = defineStoreInstance<State, Actions>((init) => 
                         },
                     };
 
-                    group.opd.push(`rule::${_ruleHash}`);
+                    group.opd.push(getRulePath(_ruleHash));
 
                     ruleHash = _ruleHash;
                 }
@@ -95,27 +95,35 @@ const queryBuilderStoreInstance = defineStoreInstance<State, Actions>((init) => 
 
                     const _groupHash = nanoid();
 
-                    const _ruleHash = nanoid();
-                    state.rules[_ruleHash] = {
-                        signature: _ruleHash,
-                        groupId: _groupHash,
-                        primary: true,
-                        where: "dropdown",
-                        data: {
-                            condition: "is",
-                            value: undefined,
-                        },
+                    const createRule = (isPrimary = false) => {
+                        const _ruleHash = nanoid();
+                        state.rules[_ruleHash] = {
+                            signature: _ruleHash,
+                            group: _groupHash,
+                            primary: isPrimary,
+                            where: "dropdown",
+                            data: {
+                                condition: "is",
+                                value: undefined,
+                            },
+                        };
+
+                        return _ruleHash;
                     };
+
+                    const _ruleFirstHash = createRule(true);
+                    const _ruleSecondHash = createRule();
 
                     state.groups[_groupHash] = {
                         id: _groupHash,
-                        rule: _ruleHash,
-                        parentGroupId: _groupId,
+                        join: getRulePath(_ruleFirstHash),
+                        parent: _groupId,
+                        primary: false,
                         op: "and",
-                        opd: [],
+                        opd: [getRulePath(_ruleSecondHash)],
                     };
 
-                    group.opd.push(`group::${_groupHash}`);
+                    group.opd.push(getGroupPath(_groupHash));
 
                     groupHash = _groupHash;
                 }
@@ -128,54 +136,85 @@ const queryBuilderStoreInstance = defineStoreInstance<State, Actions>((init) => 
             const rule = state.rules[_id];
 
             if (rule) {
-                const group = state.groups[rule.groupId];
+                const group = state.groups[rule.group];
 
                 if (group) {
-                    group.opd = group.opd.filter(item => item !== id);
+                    const cleanRule = (trigger: "rule" | "group" = "rule") => {
+                        if (group.opd.length !== 0) { return; }
 
-                    if (!rule.primary) {
-                        delete state.rules[_id];
-                    } else {
-                        const firstRuleInGroup = group.opd.length > 0 ? group.opd.find(item => isRulePath(item)) : undefined;
-                        if (firstRuleInGroup) {
-                            group.rule = extractHashId(firstRuleInGroup);
-                            group.opd = group.opd.filter(item => item !== firstRuleInGroup);
-                            state.rules[extractHashId(firstRuleInGroup)].primary = true;
-                            delete state.rules[_id];
+                        const parentGroup = group.parent ? state.groups[group.parent] : undefined;
 
-                            return;
-                        }
+                        if (trigger === "group") {
+                            if (!parentGroup) {
+                                state.query = group.join; // Promote the join of the group to the query
+                                if (isRulePath(group.join)) {
+                                    console.error("Promoted join cannot be a rule");
+                                    return;
+                                } // if the promoted join is a rule, then throw error
+                                state.groups[extractHashId(group.join)].parent = null; // Update the parent of the promoted group
+                                state.groups[extractHashId(group.join)].primary = false; // Mark the promoted group as non-primary
+                                delete state.groups[group.id]; // Delete the group from the groups
+                            } else {
+                                state.groups[extractHashId(group.join)].parent = group.parent; // Update the parent of the promoted group
 
-                        const firstGroupInGroup = group.opd.length > 0 ? group.opd.find(item => isGroupPath(item)) : undefined;
-                        const numbersOfGroupsInGroup = group.opd.filter(item => isGroupPath(item)).length;
-                        if (firstGroupInGroup) {
-                            state.groups[extractHashId(firstGroupInGroup)].parentGroupId = group.parentGroupId;
-
-                            if (numbersOfGroupsInGroup === 1) {
-                                if (group.parentGroupId) {
-                                    const parentGroup = state.groups[group.parentGroupId];
-                                    const _groupPosition = parentGroup.opd.findIndex(item => item === `group::${group.id}`);
-                                    parentGroup.opd[_groupPosition] = firstGroupInGroup;
-
-                                    delete state.rules[_id];
-                                    delete state.groups[rule.groupId];
+                                if (group.primary) {
+                                    parentGroup.join = group.join; // Promote the join of the group to the parent group
+                                    state.groups[extractHashId(group.join)].primary = true; // Mark the promoted group as primary
                                 } else {
-                                    state.query = firstGroupInGroup;
-
-                                    delete state.rules[_id];
-                                    delete state.groups[rule.groupId];
+                                    const indexOnParent = parentGroup.opd.findIndex(item => item === getGroupPath(group.id)); // Find the index of the group in the parent group operands
+                                    parentGroup.opd[indexOnParent] = group.join; // Replace the group with the promoted join
+                                    state.groups[extractHashId(group.join)].primary = false; // Mark the promoted group as primary
+                                    delete state.groups[group.id]; // Delete the group from the groups
                                 }
                             }
+                        } else if (trigger === "rule") {
+                            if (parentGroup) {
+                                if (isGroupPath(group.join)) {
+                                    state.groups[extractHashId(group.join)].parent = parentGroup.id; // Update the parent of the promoted group
+                                } else if (isRulePath(group.join)) {
+                                    state.rules[extractHashId(group.join)].group = parentGroup.id; // Update the group of the promoted rule
+                                    state.rules[extractHashId(group.join)].primary = group.primary; // Mark the promoted rule as non-primary
+                                }
 
+                                if (group.primary) {
+                                    parentGroup.join = group.join; // Promote the join of the group to the parent group
+                                } else {
+                                    const indexOnParent = parentGroup.opd.findIndex(item => item === getGroupPath(group.id)); // Find the index of the group in the parent group operands
+                                    parentGroup.opd[indexOnParent] = group.join; // Replace the group with the promoted join
+                                }
+
+                                delete state.groups[group.id]; // Delete the group from the groups
+                            }
+                        }
+                    };
+
+                    if (!rule.primary) {
+                        group.opd = group.opd.filter(item => item !== getRulePath(_id));
+                        delete state.rules[_id];
+
+                        cleanRule();
+                    } else {
+                        // First priority is to find a rule in the group and promote it to primary
+                        const firstRuleInGroup = group.opd.find(item => isRulePath(item));
+                        if (firstRuleInGroup) {
+                            group.join = firstRuleInGroup; // Promote the rule to primary
+                            group.opd = group.opd.filter(item => item !== firstRuleInGroup); // Remove the rule from the group operands
+                            state.rules[extractHashId(firstRuleInGroup)].primary = true; // Mark the rule as primary
+                            delete state.rules[_id]; // Delete the rule from the rules
+
+                            cleanRule();
                             return;
                         }
 
-                        delete state.rules[_id];
-                        delete state.groups[rule.groupId];
+                        // If there's no rule in the group, we look for first group in the group
+                        const firstGroupInGroup = group.opd.find(item => isGroupPath(item));
+                        if (firstGroupInGroup) {
+                            group.join = firstGroupInGroup; // Promote the group to primary
+                            group.opd = group.opd.filter(item => item !== firstGroupInGroup); // Remove the group from the group operands
+                            state.groups[extractHashId(firstGroupInGroup)].primary = true; // Mark the group as primary
+                            delete state.rules[_id]; // Delete the rule from the rules
 
-                        if (group.parentGroupId) {
-                            const parentGroup = state.groups[group.parentGroupId];
-                            parentGroup.opd = parentGroup.opd.filter(item => item !== `group::${rule.groupId}`);
+                            cleanRule("group");
                         }
                     }
                 }

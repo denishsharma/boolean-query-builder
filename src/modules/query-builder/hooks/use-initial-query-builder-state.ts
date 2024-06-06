@@ -8,25 +8,54 @@ export function useInitialQueryBuilderState() {
     useEffect(() => {
         loadBooleanQuery({
             rule: {
-                where: "text",
-                data: {
-                    value: "A",
+                rule: {
+                    where: "text",
+                    data: {
+                        value: "A",
+                    },
                 },
+                operator: "or",
+                operands: [
+                    {
+                        where: "dropdown",
+                        data: {
+                            condition: "is",
+                            value: "B",
+                        },
+                    },
+                    {
+                        rule: {
+                            where: "text",
+                            data: {
+                                value: "C",
+                            },
+                        },
+                        operator: "and",
+                        operands: [
+                            {
+                                where: "dropdown",
+                                data: {
+                                    condition: "is",
+                                    value: "D",
+                                },
+                            },
+                        ],
+                    },
+                ],
             },
             operator: "and",
             operands: [
                 {
-                    where: "dropdown",
+                    where: "text",
                     data: {
-                        condition: "is",
-                        value: "B",
+                        value: "E",
                     },
                 },
                 {
                     rule: {
                         where: "text",
                         data: {
-                            value: "C",
+                            value: "F",
                         },
                     },
                     operator: "or",
@@ -35,7 +64,7 @@ export function useInitialQueryBuilderState() {
                             rule: {
                                 where: "text",
                                 data: {
-                                    value: "D",
+                                    value: "G",
                                 },
                             },
                             operator: "and",
@@ -44,7 +73,7 @@ export function useInitialQueryBuilderState() {
                                     where: "dropdown",
                                     data: {
                                         condition: "is",
-                                        value: "E",
+                                        value: "H",
                                     },
                                 },
                             ],
@@ -52,7 +81,7 @@ export function useInitialQueryBuilderState() {
                         {
                             where: "text",
                             data: {
-                                value: "F",
+                                value: "I",
                             },
                         },
                     ],

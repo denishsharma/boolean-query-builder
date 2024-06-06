@@ -14,3 +14,11 @@ export function isRulePath(path: string): boolean {
 export function isGroupPath(path: string): boolean {
     return path.startsWith("group::");
 }
+
+export function getRulePath(id: string): string {
+    return `rule::${id}`;
+}
+
+export function getGroupPath(id: string): string {
+    return `group::${id}`;
+}

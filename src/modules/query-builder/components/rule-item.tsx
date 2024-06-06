@@ -39,6 +39,10 @@ export function RuleItem({ id, canDelete }: RuleItemProps) {
     return (
         <div className="flex grow gap-x-3">
             <div className="flex grow flex-col select-none gap-y-2">
+                <div className="h-5 w-fit flex items-center border border-purple-700 rounded bg-purple-900/20 px-2 text-xs font-medium leading-none op-60">
+                    {extractHashId(id)}
+                </div>
+
                 <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
                         <button

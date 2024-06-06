@@ -107,50 +107,77 @@ export function RuleGroup({ id, nested, level }: RuleGroupProps) {
     return (
         <div
             className={cn(
-                "flex flex-col divide-y divide-dark-300",
-                nested && "border rounded-xl grow border-dark-300 bg-dark-300/20 backdrop-blur-xl",
+                "flex flex-col divide-y",
+                nested && "border rounded-xl grow border-dark-200 bg-dark-300/20 shadow-md backdrop-blur-xl",
+                (level && level >= 2) ? "divide-dark-100/70" : "divide-dark-300",
             )}
         >
             <div className="flex py-4">
                 <div className="w-24 flex shrink-0 flex-col px-4">
-                    <div className="h-8 flex items-center justify-end text-sm text-teal-600 font-semibold uppercase">
-                        Where
+                    <div
+                        className={cn(
+                            "h-8 flex items-center justify-end text-sm font-semibold uppercase",
+                            isRulePath(data.join) ? "text-teal-600" : "text-purple-600",
+                        )}
+                    >
+                        {isRulePath(data.join) ? "Where" : "Join"}
                     </div>
                 </div>
 
                 <div className="flex grow flex-col pr-3">
-                    <RuleItem id={data.rule} canDelete={(data.opd.filter(item => isRulePath(item)).length > 0 || level !== 0) && !(data.opd.filter(item => isGroupPath(item)).length > 1 && data.opd.filter(item => isGroupPath(item)).length === data.opd.length)} />
+                    {isRulePath(data.join) && (
+                        <RuleItem
+                            id={data.join}
+                            canDelete={!(level === 0 && data.opd.length === 0)}
+                        />
+                    )}
+
+                    {isGroupPath(data.join) && (
+                        <RuleGroup
+                            id={data.join}
+                            nested
+                            level={(level ?? 0) + 1}
+                        />
+                    )}
                 </div>
             </div>
 
-            <div className="flex flex-col divide-y divide-dark-300">
+            <div className={cn("flex flex-col divide-y", (level && level >= 2) ? "divide-dark-100/70" : "divide-dark-300")}>
                 {operands}
             </div>
 
-            <div className="flex items-center gap-x-2 px-1 py-1">
-                <button
-                    onClick={() => addRule(id)}
-                    type="button"
-                    className="h-8 flex select-none items-center border border-transparent rounded-lg bg-transparent px-2 text-sm text-light-50/60 transition active:(border-dark-300 bg-dark-400) hover:(bg-dark-300)"
-                >
-                    <span className="i-lucide:plus mr-1.5 size-4" />
-                    <span className="pr-1">Add Rule</span>
-                </button>
+            <div className="flex items-center justify-between gap-x-2 px-1 py-1">
+                <div className="flex items-center gap-x-2">
+                    <button
+                        onClick={() => addRule(id)}
+                        type="button"
+                        className="h-8 flex select-none items-center border border-transparent rounded-lg bg-transparent px-2 text-sm text-light-50/60 transition active:(border-dark-300 bg-dark-400) hover:(bg-dark-300)"
+                    >
+                        <span className="i-lucide:plus mr-1.5 size-4" />
+                        <span className="pr-1">Add Rule</span>
+                    </button>
 
-                {(typeof level !== "undefined" && level < 2) && (
-                    <>
-                        <div className="h-4 w-px bg-dark-200" />
+                    {(typeof level !== "undefined" && level < 4) && (
+                        <>
+                            <div className="h-4 w-px bg-dark-200" />
 
-                        <button
-                            onClick={() => addGroup(id)}
-                            type="button"
-                            className="h-8 flex select-none items-center border border-transparent rounded-lg bg-transparent px-2 text-sm text-light-50/60 transition active:(border-dark-300 bg-dark-400) hover:(bg-dark-300)"
-                        >
-                            <span className="i-lucide:plus mr-1.5 size-4" />
-                            <span className="pr-1">Add Group</span>
-                        </button>
-                    </>
-                )}
+                            <button
+                                onClick={() => addGroup(id)}
+                                type="button"
+                                className="h-8 flex select-none items-center border border-transparent rounded-lg bg-transparent px-2 text-sm text-light-50/60 transition active:(border-dark-300 bg-dark-400) hover:(bg-dark-300)"
+                            >
+                                <span className="i-lucide:plus mr-1.5 size-4" />
+                                <span className="pr-1">Add Group</span>
+                            </button>
+                        </>
+                    )}
+                </div>
+
+                <div className="pr-1">
+                    <div className="h-5 w-fit flex items-center border border-cyan-700 rounded bg-cyan-900/50 px-2 text-xs font-medium leading-none op-60">
+                        {extractHashId(id)}
+                    </div>
+                </div>
             </div>
         </div>
     );
