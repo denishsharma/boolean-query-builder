@@ -1,8 +1,8 @@
 import { nanoid } from "nanoid";
 
-import type { BooleanQuery } from "~/modules/query-builder/schemas/boolean-query";
 import type { QueryRule } from "~/modules/query-builder/schemas/query-rule";
 
+import { type BooleanQuery, booleanQuerySchema } from "~/modules/query-builder/schemas/boolean-query";
 import { type BuilderInternalStructure, builderInternalStructureSchema } from "~/modules/query-builder/schemas/builder-internal-structure";
 import { getGroupPath, getRulePath } from "~/modules/query-builder/utils/extract-hash-id";
 import { isQueryStructure } from "~/modules/query-builder/utils/is-query-structure";
@@ -20,17 +20,19 @@ export function transformBooleanQueryToBuilderInternalStructure(data: BooleanQue
     };
 
     const processGroup = (group: BooleanQuery, parentGroupId: string | null = null, primary = false): string => {
+        const _group = booleanQuerySchema.parse(group);
+
         const _groupHash = nanoid();
 
-        const _joinHash = isQueryStructure(group.rule) ? getGroupPath(processGroup(group.rule, _groupHash, true)) : getRulePath(processRule(group.rule, _groupHash, true));
+        const _joinHash = isQueryStructure(_group.rule) ? getGroupPath(processGroup(_group.rule, _groupHash, true)) : getRulePath(processRule(_group.rule, _groupHash, true));
 
         groups[_groupHash] = {
             parent: parentGroupId,
             primary,
             id: _groupHash,
             join: _joinHash,
-            op: group.operator,
-            opd: group.operands.map((item) => {
+            op: _group.operator,
+            opd: _group.operands.map((item) => {
                 if (isQueryStructure(item)) {
                     return getGroupPath(processGroup(item, _groupHash));
                 } else {
