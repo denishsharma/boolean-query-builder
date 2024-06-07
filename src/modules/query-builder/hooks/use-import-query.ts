@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { toast } from "sonner";
 
 import { useQueryBuilderStore } from "~/modules/query-builder/stores/query-builder";
 
@@ -14,7 +15,13 @@ export function useImportQuery() {
             if (file) {
                 const content = await file.text();
                 const data = JSON.parse(content);
-                loadBooleanQuery(data);
+                try {
+                    loadBooleanQuery(data);
+                    toast.success("Query loaded successfully", { description: "The query has been loaded successfully. You can now see the changes in the query builder.", dismissible: true });
+                } catch (error) {
+                    console.error("Failed to load query", error);
+                    toast.error("Failed to load query", { description: "Please check the console for more information. If the problem persists, please create an issue on the repository." });
+                }
             }
         };
         input.click();

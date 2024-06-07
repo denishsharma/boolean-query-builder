@@ -7,6 +7,7 @@ import { useDebugQuery } from "~/modules/query-builder/hooks/use-debug-query";
 import { useExportQuery } from "~/modules/query-builder/hooks/use-export-query";
 import { useImportQuery } from "~/modules/query-builder/hooks/use-import-query";
 import { useInitialQueryBuilderState } from "~/modules/query-builder/hooks/use-initial-query-builder-state";
+import { useUnderlyingBooleanEquation } from "~/modules/query-builder/hooks/use-underlying-boolean-equation";
 import { QueryBuilderStoreProvider, useQueryBuilderStore } from "~/modules/query-builder/stores/query-builder";
 import { cn } from "~/utils/cn";
 import { defaultOverlayScrollbarsOptions } from "~/utils/overlayscrollbars";
@@ -31,6 +32,7 @@ function QueryBuilderFragmentConsumer() {
 
     const importQuery = useImportQuery();
     const exportQuery = useExportQuery();
+    const booleanEquation = useUnderlyingBooleanEquation();
 
     return (
         <div className="relative select-none bg-dark-800 text-light-50 h-dvh">
@@ -90,11 +92,11 @@ function QueryBuilderFragmentConsumer() {
                     </div>
 
                     <div className="bg-teal-900/15 p-3 pr-20 text-xs">
-                        Below is the boolean query builder, you can add rules and groups to create a boolean query. Below query is an example of how the query will look like in the end.
+                        Below is the boolean query builder, you can add rules and groups to create a boolean query. Below is the boolean equation of the query.
                         <br />
                         <div className="mt-3">
                             <span className="w-fit rounded-md bg-teal-800 px-2.5 py-0.5 text-sm leading-none">
-                                (A or B or (C and D)) and E and (F or (G and H) or I)
+                                {booleanEquation || "No Query"}
                             </span>
                         </div>
                     </div>
