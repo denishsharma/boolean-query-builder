@@ -69,7 +69,7 @@ const queryBuilderStoreInstance = defineStoreInstance<State, Actions>((init) => 
                         where: "dropdown",
                         data: {
                             condition: "is",
-                            value: undefined,
+                            value: null,
                         },
                     };
 
@@ -104,7 +104,7 @@ const queryBuilderStoreInstance = defineStoreInstance<State, Actions>((init) => 
                             where: "dropdown",
                             data: {
                                 condition: "is",
-                                value: undefined,
+                                value: null,
                             },
                         };
 

@@ -4,14 +4,14 @@ const dropdownRuleScehma = z.object({
     where: z.literal("dropdown"),
     data: z.object({
         condition: z.enum(["is", "is-not", "contains", "does-not-contain"]),
-        value: z.string().optional(),
+        value: z.string().nullish().default(null),
     }),
 });
 
 const textRuleSchema = z.object({
     where: z.literal("text"),
     data: z.object({
-        value: z.string().optional(),
+        value: z.string().nullish().default(null),
     }),
 });
 

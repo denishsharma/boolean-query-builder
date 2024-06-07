@@ -1,0 +1,189 @@
+{
+    "$id": "https://github.com/denishsharma/boolean-query-builder-bitespeed-task/tree/main/.resources/boolean-query-schema.json",
+    "$comment": "Boolean Query Schema for Bitespeed Task by Denish Sharma",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "rule": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/boolean-query"
+                },
+                {
+                    "$ref": "#/definitions/query-rule-dropdown"
+                },
+                {
+                    "$ref": "#/definitions/query-rule-text"
+                }
+            ]
+        },
+        "operator": {
+            "type": "string",
+            "enum": [
+                "and",
+                "or"
+            ]
+        },
+        "operands": {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {
+                        "$ref": "#/definitions/boolean-query"
+                    },
+                    {
+                        "$ref": "#/definitions/query-rule-dropdown"
+                    },
+                    {
+                        "$ref": "#/definitions/query-rule-text"
+                    }
+                ]
+            }
+        }
+    },
+    "required": [
+        "rule",
+        "operator",
+        "operands"
+    ],
+    "definitions": {
+        "boolean-query": {
+            "type": "object",
+            "properties": {
+                "rule": {
+                    "oneOf": [
+                        {
+                            "$ref": "#/definitions/boolean-query"
+                        },
+                        {
+                            "$ref": "#/definitions/query-rule-dropdown"
+                        },
+                        {
+                            "$ref": "#/definitions/query-rule-text"
+                        }
+                    ]
+                },
+                "operator": {
+                    "type": "string",
+                    "enum": [
+                        "and",
+                        "or"
+                    ]
+                },
+                "operands": {
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/definitions/boolean-query"
+                            },
+                            {
+                                "$ref": "#/definitions/query-rule-dropdown"
+                            },
+                            {
+                                "$ref": "#/definitions/query-rule-text"
+                            }
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "rule",
+                "operator",
+                "operands"
+            ],
+            "additionalProperties": false,
+            "allOf": [
+                {
+                    "if": {
+                        "properties": {
+                            "rule": {
+                                "$ref": "#/definitions/boolean-query"
+                            }
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "operands": {
+                                "type": "array",
+                                "minItems": 1
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "query-rule-dropdown": {
+            "type": "object",
+            "properties": {
+                "where": {
+                    "const": "dropdown"
+                },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "condition": {
+                            "type": "string",
+                            "enum": [
+                                "is",
+                                "is-not",
+                                "contains",
+                                "does-not-contain"
+                            ]
+                        },
+                        "value": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "condition",
+                        "value"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "where",
+                "data"
+            ]
+        },
+        "query-rule-text": {
+            "type": "object",
+            "properties": {
+                "where": {
+                    "const": "text"
+                },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "value": {
+                            "oneOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        }
+                    },
+                    "required": [
+                        "value"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "where",
+                "data"
+            ]
+        }
+    }
+}

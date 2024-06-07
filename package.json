@@ -65,6 +65,7 @@
         "@unocss/eslint-plugin": "^0.60.4",
         "@unocss/extractor-arbitrary-variants": "^0.60.4",
         "@vitejs/plugin-react": "^4.2.1",
+        "ajv": "^8.16.0",
         "axios": "^1.7.2",
         "clsx": "^2.1.1",
         "color-hash": "^2.0.2",

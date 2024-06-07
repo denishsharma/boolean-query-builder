@@ -27,13 +27,13 @@ export function RuleItem({ id, canDelete }: RuleItemProps) {
     const ruleData = produce(data.data, () => {});
 
     const updateData = useCallback((newData?: Partial<any>) => {
-        updateRuleData(id, { data: newData, where: data.where });
+        updateRuleData(id, { data: newData as any, where: data.where });
     }, [data.where, id, updateRuleData]);
 
     const handleWhereChange = useCallback((where: "dropdown" | "text") => {
         if (where === data.where) return;
 
-        updateRuleData(id, { where, data: (where === "dropdown" ? { condition: "is", value: undefined } : { value: undefined }) });
+        updateRuleData(id, { where, data: (where === "dropdown" ? { condition: "is", value: null } : { value: null }) });
     }, [data.where, id, updateRuleData]);
 
     return (

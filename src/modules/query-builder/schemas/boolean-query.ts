@@ -28,4 +28,4 @@ export const booleanQuerySchema: ZodType<BooleanQuery> = z.object({
             });
         }
     }
-});
+}) as ZodType<BooleanQuery>; // This is a workaround for a type bug when using default values
