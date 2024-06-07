@@ -33,7 +33,7 @@ function QueryBuilderFragmentConsumer() {
     const exportQuery = useExportQuery();
 
     return (
-        <div className="relative bg-dark-800 text-light-50 h-dvh">
+        <div className="relative select-none bg-dark-800 text-light-50 h-dvh">
             <OverlayScrollbarsComponent defer options={defaultOverlayScrollbarsOptions} className="h-dvh">
                 <div className="m-20 mx-a w-5xl overflow-clip border border-dark-300 rounded-xl bg-dark-600 shadow-lg divide-y divide-dark-300">
                     <div className="gapx-4 flex items-center justify-between bg-dark-400/50 p-3">
@@ -93,7 +93,9 @@ function QueryBuilderFragmentConsumer() {
                         Below is the boolean query builder, you can add rules and groups to create a boolean query. Below query is an example of how the query will look like in the end.
                         <br />
                         <div className="mt-3">
-                            <span className="w-fit rounded-md bg-teal-800 px-2.5 py-0.5 text-sm leading-none">A & B & (C | (D & E) | F)</span>
+                            <span className="w-fit rounded-md bg-teal-800 px-2.5 py-0.5 text-sm leading-none">
+                                (A or B or (C and D)) and E and (F or (G and H) or I)
+                            </span>
                         </div>
                     </div>
 
