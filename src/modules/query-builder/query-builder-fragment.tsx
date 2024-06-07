@@ -120,7 +120,7 @@ function QueryBuilderFragmentConsumer() {
 
     return (
         <div className="relative select-none bg-dark-800 text-light-50 h-dvh">
-            <OverlayScrollbarsComponent defer options={defaultOverlayScrollbarsOptions} className="h-dvh">
+            <OverlayScrollbarsComponent defer options={defaultOverlayScrollbarsOptions} className="of-hidden h-dvh">
                 <div className="m-20 mx-a w-5xl overflow-clip border border-dark-300 rounded-xl bg-dark-600 shadow-lg divide-y divide-dark-300">
                     <div className="gapx-4 flex items-center justify-between bg-dark-400/50 p-3">
                         <div className="flex items-center">
