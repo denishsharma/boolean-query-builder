@@ -192,7 +192,11 @@ const queryBuilderStoreInstance = defineStoreInstance<State, Actions>((init) => 
                         group.opd = group.opd.filter(item => item !== getRulePath(_id));
                         delete state.rules[_id];
 
-                        cleanRule();
+                        if (isGroupPath(group.join) && group.opd.length === 0) {
+                            cleanRule("group");
+                        } else {
+                            cleanRule();
+                        }
                     } else {
                         // First priority is to find a rule in the group and promote it to primary
                         const firstRuleInGroup = group.opd.find(item => isRulePath(item));
