@@ -1,10 +1,9 @@
-import ColorHash from "color-hash";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
-import { type ComponentPropsWithoutRef, Fragment, useMemo } from "react";
 
-import type { ReactNode } from "@tanstack/react-router";
+import type { ComponentPropsWithoutRef } from "react";
 
 import { RuleGroup } from "~/modules/query-builder/components/rule-group";
+import { useBooleanEquationElements } from "~/modules/query-builder/hooks/use-boolean-equation-elements";
 import { useDebugQuery } from "~/modules/query-builder/hooks/use-debug-query";
 import { useExportQuery } from "~/modules/query-builder/hooks/use-export-query";
 import { useImportQuery } from "~/modules/query-builder/hooks/use-import-query";
@@ -13,19 +12,6 @@ import { useUnderlyingBooleanEquation } from "~/modules/query-builder/hooks/use-
 import { QueryBuilderStoreProvider, useQueryBuilderStore } from "~/modules/query-builder/stores/query-builder";
 import { cn } from "~/utils/cn";
 import { defaultOverlayScrollbarsOptions } from "~/utils/overlayscrollbars";
-
-const booleanBrakcetColorHash = new ColorHash({
-    hue: [
-        { min: 0, max: 20 }, // Red range
-        { min: 20, max: 40 }, // Orange range
-        { min: 40, max: 80 }, // Bright yellow-green range
-        { min: 160, max: 220 }, // Bright green-blue range
-        { min: 200, max: 240 }, // Bright blue range
-        { min: 300, max: 340 }, // Pink range
-    ],
-    saturation: [0.7, 1], // Higher saturation for more vibrant colors
-    lightness: [0.5, 0.7], // Adjust lightness to ensure readability on dark backgrounds
-});
 
 function SocialButtonLink({ className, children, ...props }: ComponentPropsWithoutRef<"a">) {
     return (
@@ -36,17 +22,6 @@ function SocialButtonLink({ className, children, ...props }: ComponentPropsWitho
         >
             {children}
         </a>
-    );
-}
-
-function BooleanOperationItem({ children, className, ...props }: ComponentPropsWithoutRef<"span">) {
-    return (
-        <span
-            {...props}
-            className={cn("inline-block rounded-md px-1 h-5.5 flex items-center text-xs leading-none", className)}
-        >
-            {children}
-        </span>
     );
 }
 
@@ -61,66 +36,11 @@ function QueryBuilderFragmentConsumer() {
     const exportQuery = useExportQuery();
     const booleanEquation = useUnderlyingBooleanEquation();
 
-    const explodedBooleanEquation = useMemo(() => {
-        if (!booleanEquation) return null;
-
-        const tokens = booleanEquation.split(" ")
-            .flatMap(token => token.match(/[\w-]+|[()]/g) || [])
-            .reduce((acc, token) => {
-                if (token === "(" || token === ")") {
-                    const newToken = token === "(" ? `(::${++acc.level}` : `)::${acc.level--}`;
-                    acc.tokens.push(newToken);
-                } else {
-                    acc.tokens.push(token);
-                }
-                return acc;
-            }, { tokens: [] as string[], level: 0 }).tokens;
-
-        const elementCache: { [key: string]: ReactNode } = {};
-
-        const elements = tokens.map((token, index) => {
-            const [baseToken, level] = token.split("::");
-            const _key = `${token}-${index}`;
-
-            if (level !== undefined) {
-                if (!elementCache[_key]) {
-                    elementCache[_key] = (
-                        <BooleanOperationItem className="border border-dark-50 bg-dark-200" style={{ color: booleanBrakcetColorHash.hex(level) }}>
-                            {baseToken}
-                        </BooleanOperationItem>
-                    );
-                }
-                return (
-                    <Fragment key={_key}>
-                        {elementCache[_key]}
-                    </Fragment>
-                );
-            } else {
-                if (!elementCache[token]) {
-                    const classNames = cn(
-                        "border",
-                        token === "or" ? "bg-amber-900/20 border-amber-800" : token === "and" ? "bg-blue-900/20 border-blue-800" : "font-medium border-purple-800 bg-purple-900/20",
-                    );
-                    elementCache[token] = (
-                        <BooleanOperationItem className={classNames}>
-                            {token}
-                        </BooleanOperationItem>
-                    );
-                }
-                return (
-                    <Fragment key={_key}>
-                        {elementCache[token]}
-                    </Fragment>
-                );
-            }
-        });
-
-        return elements;
-    }, [booleanEquation]);
+    const explodedBooleanEquation = useBooleanEquationElements(booleanEquation);
 
     return (
         <div className="relative select-none bg-dark-800 text-light-50 h-dvh">
-            <OverlayScrollbarsComponent defer options={defaultOverlayScrollbarsOptions} className="of-hidden h-dvh">
+            <OverlayScrollbarsComponent options={defaultOverlayScrollbarsOptions} className="of-hidden h-dvh">
                 <div className="m-20 mx-a w-5xl overflow-clip border border-dark-300 rounded-xl bg-dark-600 shadow-lg divide-y divide-dark-300">
                     <div className="gapx-4 flex items-center justify-between bg-dark-400/50 p-3">
                         <div className="flex items-center">
