@@ -11,12 +11,14 @@ import { useInitialQueryBuilderState } from "~/modules/query-builder/hooks/use-i
 import { useUnderlyingBooleanEquation } from "~/modules/query-builder/hooks/use-underlying-boolean-equation";
 import { QueryBuilderStoreProvider, useQueryBuilderStore } from "~/modules/query-builder/stores/query-builder";
 import { cn } from "~/utils/cn";
+import { trackExportSchemaClick, trackImportSchemaClick, trackLogInternalStructureClick, trackSocialLinkClick } from "~/utils/ga4";
 import { defaultOverlayScrollbarsOptions } from "~/utils/overlayscrollbars";
 
 function SocialButtonLink({ className, children, ...props }: ComponentPropsWithoutRef<"a">) {
     return (
         <a
             target="_blank"
+            rel="noopener noreferrer"
             className={cn("size-7 cursor-pointer flex items-center justify-center gap-x-2 border border-transparent rounded-lg bg-transparent text-sm transition active:(border-dark-300 bg-dark-400) hover:(bg-dark-200)", className)}
             {...props}
         >
@@ -38,6 +40,21 @@ function QueryBuilderFragmentConsumer() {
 
     const explodedBooleanEquation = useBooleanEquationElements(booleanEquation);
 
+    function handleExportQuery() {
+        exportQuery();
+        trackExportSchemaClick();
+    }
+
+    function handleImportQuery() {
+        importQuery();
+        trackImportSchemaClick();
+    }
+
+    function handleLogInternalStructure() {
+        logInternalStructure();
+        trackLogInternalStructureClick();
+    }
+
     return (
         <div className="relative select-none bg-dark-800 text-light-50 h-dvh">
             <OverlayScrollbarsComponent options={defaultOverlayScrollbarsOptions} className="of-hidden h-dvh">
@@ -53,7 +70,13 @@ function QueryBuilderFragmentConsumer() {
                                     Boolean Query Builder - Bitespeed Live Task
                                 </div>
 
-                                <a href="https://github.com/denishsharma" className="text-xs text-light-50/60 leading-none transition active:(op-100) hover:(op-80)">
+                                <a
+                                    href="https://github.com/denishsharma"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={() => trackSocialLinkClick("github-profile")}
+                                    className="text-xs text-light-50/60 leading-none transition active:(op-100) hover:(op-80)"
+                                >
                                     By
                                     {" "}
                                     <span className="underline underline-gray-500 underline-offset-2 underline-dashed">
@@ -67,7 +90,7 @@ function QueryBuilderFragmentConsumer() {
                             <button
                                 type="button"
                                 title="Console Log Internal Structure"
-                                onClick={logInternalStructure}
+                                onClick={handleLogInternalStructure}
                                 className="size-8 flex cursor-pointer items-center justify-center gap-x-2 border border-transparent rounded-lg bg-transparent text-sm outline-none transition active:(border-dark-300 bg-dark-400) hover:(bg-dark-200) light:active:(border-gray-300 bg-light-50) light:hover:(bg-light-50)"
                             >
                                 <span className="i-mynaui:terminal size-5 transition" />
@@ -78,7 +101,7 @@ function QueryBuilderFragmentConsumer() {
                             <button
                                 type="button"
                                 title="Import Query JSON"
-                                onClick={importQuery}
+                                onClick={handleImportQuery}
                                 className="size-8 flex cursor-pointer items-center justify-center gap-x-2 border border-transparent rounded-lg bg-transparent text-sm outline-none transition active:(border-dark-300 bg-dark-400) hover:(bg-dark-200) light:active:(border-gray-300 bg-light-50) light:hover:(bg-light-50)"
                             >
                                 <span className="i-mynaui:upload size-5 transition" />
@@ -87,7 +110,7 @@ function QueryBuilderFragmentConsumer() {
                             <button
                                 type="button"
                                 title="Export Query JSON"
-                                onClick={exportQuery}
+                                onClick={handleExportQuery}
                                 className="size-8 flex cursor-pointer items-center justify-center gap-x-2 border border-transparent rounded-lg bg-transparent text-sm outline-none transition active:(border-dark-300 bg-dark-400) hover:(bg-dark-200) light:active:(border-gray-300 bg-light-50) light:hover:(bg-light-50)"
                             >
                                 <span className="i-mynaui:download size-5 transition" />
@@ -122,11 +145,19 @@ function QueryBuilderFragmentConsumer() {
 
                     <div className="flex items-center justify-between py-1 pl-1.5 pr-2.5">
                         <div className="flex items-center">
-                            <SocialButtonLink href="https://www.linkedin.com/in/denishsharma/">
+                            <SocialButtonLink
+                                title="LinkedIn"
+                                onClick={() => trackSocialLinkClick("linkedin")}
+                                href="https://www.linkedin.com/in/denishsharma/"
+                            >
                                 <div className="i-mynaui:brand-linkedin size-4" />
                             </SocialButtonLink>
 
-                            <SocialButtonLink href="https://github.com/denishsharma/boolean-query-builder-bitespeed-task/">
+                            <SocialButtonLink
+                                title="GitHub"
+                                onClick={() => trackSocialLinkClick("github-repo")}
+                                href="https://github.com/denishsharma/boolean-query-builder-bitespeed-task/"
+                            >
                                 <div className="i-mynaui:brand-github size-4" />
                             </SocialButtonLink>
                         </div>

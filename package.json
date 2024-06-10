@@ -83,6 +83,7 @@
         "overlayscrollbars-react": "^0.5.6",
         "perfect-debounce": "^1.0.0",
         "radash": "^12.1.0",
+        "react-ga4": "^2.1.0",
         "react-use": "^17.5.0",
         "sass": "^1.77.4",
         "simple-git-hooks": "^2.11.1",

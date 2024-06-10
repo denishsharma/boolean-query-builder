@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { ClickScrollPlugin, OverlayScrollbars } from "overlayscrollbars";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import ReactGA from "react-ga4";
 
 import { routeTree } from "~/../.generated/routeTree.gen";
 import { RouteNotFound } from "~/components/route-not-found";
@@ -26,6 +27,8 @@ declare module "@tanstack/react-router" {
 const queryClient = new QueryClient();
 
 OverlayScrollbars.plugin(ClickScrollPlugin);
+
+ReactGA.initialize("G-SMTTV6TSC0");
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
