@@ -1,6 +1,6 @@
 {
-    "$id": "https://github.com/denishsharma/boolean-query-builder-bitespeed-task/tree/main/.resources/boolean-query-schema.json",
-    "$comment": "Boolean Query Schema for Bitespeed Task by Denish Sharma",
+    "$id": "https://github.com/denishsharma/boolean-query-builder/tree/main/.resources/boolean-query-schema.json",
+    "$comment": "Boolean Query Schema by Denish Sharma",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "properties": {

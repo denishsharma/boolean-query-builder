@@ -25,7 +25,7 @@ export function useImportQuery() {
 
                 if (!valid) {
                     toast.error("Invalid boolean query schema", { description: "The schema of the query is invalid. Please check the console for more information." });
-                    console.info("Schema reference: https://github.com/denishsharma/boolean-query-builder-bitespeed-task/tree/main/.resources/boolean-query-schema.json"); // eslint-disable-line no-console
+                    console.info("Schema reference: https://github.com/denishsharma/boolean-query-builder/tree/main/.resources/boolean-query-schema.json"); // eslint-disable-line no-console
                     console.error("Invalid schema", schemaValidator.errors);
                     return;
                 }

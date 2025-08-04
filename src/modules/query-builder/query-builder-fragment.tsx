@@ -67,7 +67,7 @@ function QueryBuilderFragmentConsumer() {
 
                             <div className="ml-3 h-full flex flex-col select-none justify-center gap-y-1 leading-none">
                                 <div className="text-sm font-medium leading-none">
-                                    Boolean Query Builder - Bitespeed Live Task
+                                    Boolean Query Builder
                                 </div>
 
                                 <a
@@ -156,7 +156,7 @@ function QueryBuilderFragmentConsumer() {
                             <SocialButtonLink
                                 title="GitHub"
                                 onClick={() => trackSocialLinkClick("github-repo")}
-                                href="https://github.com/denishsharma/boolean-query-builder-bitespeed-task/"
+                                href="https://github.com/denishsharma/boolean-query-builder/"
                             >
                                 <div className="i-mynaui:brand-github size-4" />
                             </SocialButtonLink>
